@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "name": "tailwind-au-product-guide",
+  "builds": [{"src": "index.html", "use": "@vercel/static"}],
+  "routes": [{"src": "/(.*)", "dest": "/index.html"}],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {"key": "Cache-Control", "value": "public, max-age=3600"},
+        {"key": "X-Content-Type-Options", "value": "nosniff"}
+      ]
+    }
+  ]
+}
