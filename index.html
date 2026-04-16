@@ -792,7 +792,7 @@ function initButtons(){
 }
 function shareApp(){
   const url=window.location.href;
-  const data={title:'Tailwind Nutrition Australia',text:'Tailwind Australia product guide',url:url};
+  const data={title:'Tailwind Nutrition Australia — Product Guide',text:'Tailwind Nutrition Australia product guide — endurance fueling, hydration and recovery.\n\n'+url};
   if(navigator.share){
     navigator.share(data).catch(function(){});
   } else {
