@@ -744,21 +744,6 @@ footer a:hover{color:var(--tw-orange)}
   </div>
 </footer>
 
-<!-- INSTALL MODAL -->
-<div id="imodal" onclick="if(event.target===this)closeModal()">
-  <div class="imbox" role="dialog" aria-labelledby="imtitle" aria-modal="true">
-    <button class="imclose" onclick="closeModal()" aria-label="Close">×</button>
-    <div class="imicon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-    </div>
-    <div id="imtitle" class="imtitle">Install Tailwind AU</div>
-    <div class="imsub" id="imsub">Add this guide to your home screen for instant offline access.</div>
-    <ol class="imsteps" id="imsteps"></ol>
-    <button class="imbtn" id="imaction" onclick="modalAction()">Got it</button>
-    <button class="imbtn secondary" onclick="closeModal()">Not now</button>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -788,7 +773,8 @@ function showShareButton(){var b=document.getElementById('shareBtn');if(b)b.styl
 function initButtons(){
   showShareButton();
   if(isStandalone){hideInstallButton();return;}
-  if(isIOS||isAndroid||!isMacSafari){showInstallButton();}
+  /* Install button only shown when beforeinstallprompt fires (Android/desktop Chrome/Edge) */
+  if(deferredPrompt){showInstallButton();}else{hideInstallButton();}
 }
 function shareApp(){
   const url=window.location.href;
@@ -818,56 +804,8 @@ function installApp(){
       if(c.outcome==='accepted'){hideInstallButton();}
       deferredPrompt=null;
     });
-    return;
   }
-  showInstallModal();
 }
-function showInstallModal(){
-  const m=document.getElementById('imodal');
-  const title=document.getElementById('imtitle');
-  const sub=document.getElementById('imsub');
-  const steps=document.getElementById('imsteps');
-  const btn=document.getElementById('imaction');
-  const shareSvg='<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8.5 1.207a.5.5 0 0 0-.708-.707L5.146 3.146a.5.5 0 1 0 .708.708L7.5 2.207V10a.5.5 0 0 0 1 0V2.207l1.646 1.647a.5.5 0 1 0 .708-.708L8.5 1.207z"/><path d="M3 7.5a1.5 1.5 0 0 1 1.5-1.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 0-.5.5v6a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 1 0-1h1A1.5 1.5 0 0 1 13 7.5v6a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 13.5v-6z"/></svg>';
-  const plusSvg='<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M3.5 0a.5.5 0 0 1 .5.5V2h1.5a.5.5 0 0 1 0 1H4v1.5a.5.5 0 0 1-1 0V3H1.5a.5.5 0 0 1 0-1H3V.5a.5.5 0 0 1 .5-.5zM11.5 6a.5.5 0 0 1 .5.5V8h1.5a.5.5 0 0 1 0 1H12v1.5a.5.5 0 0 1-1 0V9H9.5a.5.5 0 0 1 0-1H11V6.5a.5.5 0 0 1 .5-.5zM2.5 11a.5.5 0 0 1 .5.5V13h1.5a.5.5 0 0 1 0 1H3v1.5a.5.5 0 0 1-1 0V14H.5a.5.5 0 0 1 0-1H2v-1.5a.5.5 0 0 1 .5-.5z"/></svg>';
-  if(isSafariOnIOS){
-    title.textContent='Add to Home Screen';
-    sub.textContent='Install Tailwind AU on your iPhone';
-    steps.innerHTML='<li><span class="imnum">1</span><span>Tap the Share button '+shareSvg+' at the bottom of Safari</span></li><li><span class="imnum">2</span><span>Scroll and tap <strong>Add to Home Screen</strong> '+plusSvg+'</span></li><li><span class="imnum">3</span><span>Tap <strong>Add</strong> in the top right</span></li>';
-    btn.style.display='none';
-  } else if(isIOS){
-    title.textContent='Open in Safari to install';
-    sub.textContent='iPhone install requires Safari';
-    steps.innerHTML='<li><span class="imnum">1</span><span>Copy the link below</span></li><li><span class="imnum">2</span><span>Open <strong>Safari</strong> on this iPhone</span></li><li><span class="imnum">3</span><span>Paste the link, then tap Share '+shareSvg+' &rarr; <strong>Add to Home Screen</strong></span></li>';
-    btn.textContent='Copy link';
-    btn.style.display='inline-flex';
-    btn.onclick=function(){copyLink(window.location.href);};
-  } else if(isAndroid){
-    title.textContent='Install Tailwind AU';
-    sub.textContent='Add to your Android home screen';
-    steps.innerHTML='<li><span class="imnum">1</span><span>Tap the menu (&#8942;) in your browser</span></li><li><span class="imnum">2</span><span>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong></span></li><li><span class="imnum">3</span><span>Confirm to install</span></li>';
-    btn.textContent='Got it';
-    btn.style.display='inline-flex';
-    btn.onclick=closeModal;
-  } else if(isMacSafari){
-    title.textContent='Add to Dock';
-    sub.textContent='Install on your Mac';
-    steps.innerHTML='<li><span class="imnum">1</span><span>In Safari menu bar, click <strong>File</strong></span></li><li><span class="imnum">2</span><span>Click <strong>Add to Dock&hellip;</strong></span></li><li><span class="imnum">3</span><span>Click <strong>Add</strong></span></li>';
-    btn.textContent='Got it';
-    btn.style.display='inline-flex';
-    btn.onclick=closeModal;
-  } else {
-    title.textContent='Install Tailwind AU';
-    sub.textContent='Install on your computer';
-    steps.innerHTML='<li><span class="imnum">1</span><span>Look for the install icon in your browser address bar</span></li><li><span class="imnum">2</span><span>Click it and confirm <strong>Install</strong></span></li><li><span class="imnum">3</span><span>The app will open in its own window</span></li>';
-    btn.textContent='Got it';
-    btn.style.display='inline-flex';
-    btn.onclick=closeModal;
-  }
-  m.classList.add('show');
-}
-function closeModal(){var m=document.getElementById('imodal');if(m)m.classList.remove('show');}
-function modalAction(){closeModal();}
 function showToast(msg){
   var t=document.getElementById('toast');if(!t)return;
   t.textContent=msg;t.classList.add('show');
